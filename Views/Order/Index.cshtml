@@ -1,0 +1,135 @@
+﻿@model IEnumerable<CodeAlpha_EcommerceStore.Models.Order>
+
+<div class="container py-5">
+    <div class="row mb-5 justify-content-center">
+        <div class="col-md-8 text-center">
+            <h2 class="fw-bold text-dark display-5">Order Tracking</h2>
+            <p class="text-muted fs-5">Manage your purchases and check delivery status in real-time.</p>
+            <div class="mx-auto bg-primary rounded-pill" style="width: 50px; height: 5px;"></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var order in Model)
+        {
+            <div class="col-lg-6">
+                <div class="order-card p-4 h-100 border-0 shadow-sm rounded-4 bg-white position-relative overflow-hidden">
+                    <!-- Subtle Side Border for Status -->
+                    <div class="status-indicator @(order.Status == "Pending" ? "bg-warning" : order.Status == "Cancelled" ? "bg-danger" : "bg-success")"></div>
+                    
+                    <div class="d-flex flex-column h-100">
+                        <!-- Top Row: ID and Date -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="text-uppercase x-small fw-bold text-muted letter-spacing">Order Reference</span>
+                                <h6 class="fw-bold text-primary mb-0">#ORD-@order.OrderId</h6>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge @(order.Status == "Pending" ? "bg-warning-subtle text-warning" : order.Status == "Cancelled" ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success") rounded-pill px-3 py-2">
+                                    <i class="bi bi-dot"></i> @order.Status
+                                </span>
+                            </div>
+                        </div>
+
+                        <hr class="opacity-10">
+
+                        <!-- Main Content -->
+                        <div class="row align-items-center flex-grow-1 my-3">
+                            <div class="col-sm-7 border-end-sm">
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="icon-circle bg-light me-3">
+                                        <i class="bi bi-wallet2 text-dark"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Amount Paid</small>
+                                        <span class="fw-bold fs-5 text-dark">Rs. @order.TotalAmount.ToString("N0")</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-circle bg-light me-3">
+                                        <i class="bi bi-geo-alt text-dark"></i>
+                                    </div>
+                                    <div class="text-truncate" style="max-width: 200px;">
+                                        <small class="text-muted d-block">Shipping To</small>
+                                        <span class="fw-bold text-dark small">@order.City, @order.ShippingAddress</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 ps-md-4 mt-3 mt-sm-0">
+                                <div class="mb-2">
+                                    <small class="text-muted d-block mb-1">Customer</small>
+                                    <span class="small fw-bold"><i class="bi bi-person me-1"></i> @order.CustomerName</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block mb-1">Order Date</small>
+                                    <span class="small fw-bold"><i class="bi bi-clock me-1"></i> @order.OrderDate?.ToString("dd MMM, yyyy")</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Action -->
+                        <div class="mt-auto pt-3">
+                            <a asp-action="Details" asp-route-id="@order.OrderId" 
+                               class="btn btn-dark w-100 rounded-3 py-2 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2 hover-btn">
+                                Track Details <i class="bi bi-arrow-right-short fs-4"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    body { background-color: #f8f9fa; }
+    
+    .letter-spacing { letter-spacing: 1px; }
+    .x-small { font-size: 0.7rem; }
+    
+    .order-card {
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0,0,0,0.05) !important;
+    }
+    
+    .order-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important;
+        border-color: rgba(13, 110, 253, 0.2) !important;
+    }
+
+    .status-indicator {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 6px;
+    }
+
+    .icon-circle {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bg-warning-subtle { background-color: #fff3cd !important; }
+    .bg-danger-subtle { background-color: #f8d7da !important; }
+    .bg-success-subtle { background-color: #d1e7dd !important; }
+
+    .hover-btn {
+        transition: all 0.3s ease;
+        background: #1a1a1a;
+    }
+
+    .hover-btn:hover {
+        background: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    @@media (min-width: 576px) {
+        .border-end-sm { border-right: 1px solid rgba(0,0,0,0.1) !important; }
+    }
+</style>

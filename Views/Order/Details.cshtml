@@ -1,0 +1,149 @@
+﻿@model CodeAlpha_EcommerceStore.Models.Order
+
+<div class="container py-5">
+    <!-- Top Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none">Orders</a></li>
+                    <li class="breadcrumb-item active">#@Model.OrderId</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">Order <span class="text-primary text-gradient">#@Model.OrderId</span></h2>
+        </div>
+        <a asp-action="Index" class="btn btn-outline-dark rounded-pill px-4 shadow-sm">
+            <i class="bi bi-arrow-left me-2"></i> Back to History
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Side: Items List (Card Style) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-bottom-0">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-cart3 me-2 text-primary"></i>Items in your package</h6>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <li class="list-group-item p-4 border-light">
+                                <div class="d-flex align-items-center">
+                                    <!-- Simple Placeholder for Product Icon -->
+                                    <div class="bg-light rounded-3 p-3 me-4">
+                                        <i class="bi bi-box-seam fs-3 text-secondary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-1">@item.Product?.ProductName</h6>
+                                        <small class="text-muted">Quantity: @item.Quantity</small>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="mb-0 fw-bold text-dark">Rs. @(item.UnitPrice * item.Quantity)</p>
+                                        <small class="text-muted small">Rs. @item.UnitPrice each</small>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Shipping Info Card -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-4 text-uppercase small text-muted letter-spacing">Delivery Address</h6>
+                    <div class="d-flex align-items-start">
+                        <div class="icon-circle bg-danger-subtle text-danger me-3">
+                            <i class="bi bi-geo-alt-fill"></i>
+                        </div>
+                        <div>
+                            <p class="fw-bold mb-1">@Model.CustomerName</p>
+                            <p class="text-muted mb-0 small">@Model.ShippingAddress, @Model.City</p>
+                            <p class="text-muted mb-0 small">Phone: @Model.PhoneNumber</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Order Summary Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden text-white bg-primary bg-gradient-custom shadow-primary">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4">Payment Summary</h5>
+                    
+                    <div class="d-flex justify-content-between mb-3 opacity-75">
+                        <span>Order Date</span>
+                        <span>@Model.OrderDate?.ToString("dd MMM, yyyy")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 opacity-75">
+                        <span>Payment Method</span>
+                        <span>@Model.PaymentMethod</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Current Status</span>
+                        <span class="badge bg-white text-primary rounded-pill px-3">@Model.Status</span>
+                    </div>
+                    
+                    <hr class="my-4 border-white opacity-25">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fs-5">Grand Total</span>
+                        <h2 class="fw-bold mb-0">Rs. @Model.TotalAmount.ToString("N0")</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Need Help Card -->
+            <div class="card border-0 shadow-sm rounded-4 mt-4 bg-light">
+                <div class="card-body p-4 text-center">
+                    <p class="small text-muted mb-3">Something wrong with your order?</p>
+                    <button class="btn btn-white btn-sm border rounded-pill px-4 shadow-sm fw-bold">Contact Support</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #fcfcfd;
+    }
+    
+    .bg-gradient-custom {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+    }
+
+    .shadow-primary {
+        box-shadow: 0 1rem 3rem rgba(13, 110, 253, 0.25) !important;
+    }
+
+    .icon-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .text-gradient {
+        background: -webkit-linear-gradient(#0d6efd, #0b5ed7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .letter-spacing {
+        letter-spacing: 1px;
+    }
+
+    .list-group-item {
+        transition: background 0.3s ease;
+    }
+
+        .list-group-item:hover {
+            background-color: #fafafa;
+        }
+</style>

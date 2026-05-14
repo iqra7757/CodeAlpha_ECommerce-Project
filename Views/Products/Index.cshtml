@@ -1,0 +1,244 @@
+﻿@model IEnumerable<CodeAlpha_EcommerceStore.Models.Product>
+
+@{
+    ViewData["Title"] = "Product Inventory";
+}
+
+<div class="container-fluid py-4">
+    <!-- Header with Search & Add Product -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-3">
+            <h2 class="fw-bold text-dark m-0">Inventory</h2>
+            <p class="text-muted small">Manage your product collection.</p>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="input-group shadow-sm rounded-pill overflow-hidden bg-white">
+                <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" 
+                       class="form-control border-0 px-4 py-2" placeholder="Search by name or category...">
+                <button class="btn btn-white border-0 pe-3" type="submit">
+                    <i class="bi bi-search text-primary"></i>
+                </button>
+            </form>
+        </div>
+
+        <div class="col-md-3 text-end">
+            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <i class="bi bi-plus-lg me-2"></i> Add New
+            </button>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-5 g-4">
+        @if (!Model.Any())
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-search display-1 text-muted"></i>
+                <p class="mt-3 fs-5">No products found matching "@ViewData["CurrentFilter"]"</p>
+                <a asp-action="Index" class="btn btn-link">Clear Filter</a>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm product-card rounded-4 overflow-hidden bg-white">
+                        <div class="position-relative cursor-pointer" onclick="openQuickView('@item.ProductId')" style="cursor: pointer;">
+                            <img src="@item.ImageUrl" class="card-img-top" alt="@item.ProductName" 
+                                 style="height: 200px; object-fit: cover;" 
+                                 onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                            <span class="badge bg-white text-dark position-absolute top-0 end-0 m-3 shadow-sm">
+                                @item.Category?.CategoryName
+                            </span>
+                        </div>
+
+                        <div class="card-body d-flex flex-column p-3">
+                            <h6 class="card-title fw-bold text-dark mb-1 text-truncate" onclick="openQuickView('@item.ProductId')" style="cursor: pointer;">
+                                @item.ProductName
+                            </h6>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="text-primary fw-bold fs-5">Rs. @item.Price.ToString("N0")</span>
+                                <span class="small text-muted">Stock: @item.StockQuantity</span>
+                            </div>
+                            
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post" class="mt-auto">
+                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-outline-primary rounded-pill w-100 fw-bold btn-sm py-2">
+                                    <i class="bi bi-cart-plus me-2"></i> Add To Cart
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <!-- PAGINATION -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-5">
+            <nav>
+                <ul class="pagination shadow-sm rounded-pill overflow-hidden">
+                    <li class="page-item @(ViewBag.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link border-0 px-4 py-2 fw-bold" 
+                           asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.CurrentPage - 1)" 
+                           asp-route-searchString="@ViewData["CurrentFilter"]">
+                            <i class="bi bi-chevron-left me-1"></i> Prev
+                        </a>
+                    </li>
+                    
+                    <li class="page-item disabled">
+                        <span class="page-link border-0 text-dark px-4 py-2">
+                            Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+                        </span>
+                    </li>
+
+                    <li class="page-item @(ViewBag.HasNextPage ? "" : "disabled")">
+                        <a class="page-link border-0 px-4 py-2 fw-bold" 
+                           asp-action="Index" 
+                           asp-route-pageNumber="@(ViewBag.CurrentPage + 1)" 
+                           asp-route-searchString="@ViewData["CurrentFilter"]">
+                            Next <i class="bi bi-chevron-right ms-1"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<!-- QUICK VIEW MODAL (Wahi Layout) -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-body p-0">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal"></button>
+                <div class="row g-0">
+                    <div class="col-md-6 bg-light d-flex align-items-center justify-content-center">
+                        <img id="qvImage" src="" class="img-fluid w-100 h-100 object-fit-cover" style="min-height: 400px;" />
+                    </div>
+                    <div class="col-md-6 p-4 py-5">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-2 small">
+                                <li class="breadcrumb-item text-primary" id="qvCategory"></li>
+                            </ol>
+                        </nav>
+                        <h2 id="qvName" class="fw-bold text-dark mb-3"></h2>
+                        <h3 id="qvPrice" class="text-primary fw-bold mb-4"></h3>
+                        
+                        <div class="mb-4">
+                            <p class="text-muted mb-2 small fw-bold">PRODUCT DESCRIPTION</p>
+                            <p class="text-secondary small">This is a premium quality item from our collection. Perfect for your daily needs.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <span class="small fw-bold text-dark">AVAILABILITY:</span>
+                            <span id="qvStock" class="ms-2 badge rounded-pill"></span>
+                        </div>
+
+                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                            <input type="hidden" id="qvId" name="productId" />
+                            <div class="d-flex gap-2">
+                                <input type="number" name="quantity" value="1" min="1" class="form-control text-center rounded-pill" style="width: 80px;" />
+                                <button type="submit" class="btn btn-primary flex-grow-1 rounded-pill fw-bold shadow-sm">
+                                    <i class="bi bi-cart-plus me-2"></i> Add To Cart
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold">Add New Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">PRODUCT NAME</label>
+                        <input name="ProductName" class="form-control bg-light border-0 py-2" required />
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label small fw-bold text-muted">PRICE (RS)</label>
+                            <input name="Price" type="number" class="form-control bg-light border-0 py-2" required />
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label small fw-bold text-muted">STOCK</label>
+                            <input name="StockQuantity" type="number" class="form-control bg-light border-0 py-2" required />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">CATEGORY</label>
+                        <select name="CategoryId" class="form-select bg-light border-0 py-2" asp-items="ViewBag.CategoryId" required>
+                            <option value="">-- Select Category --</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">IMAGE</label>
+                        <input type="file" name="ImageFile" class="form-control bg-light border-0 py-2" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">Save Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-card { transition: all 0.3s ease; }
+    .product-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important; }
+    .page-link { color: #4e73df; transition: 0.2s; }
+    .page-link:hover { background: #f8f9fc; }
+    .page-item.disabled .page-link { background-color: #f8f9fc; color: #ccc; }
+</style>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function openQuickView(id) {
+            $.ajax({
+                url: '/Products/GetProduct/' + id,
+                type: 'GET',
+                success: function (data) {
+                    if (data) {
+                        $('#qvName').text(data.productName);
+                        $('#qvPrice').text('Rs. ' + data.price.toLocaleString());
+                        $('#qvCategory').text(data.category.categoryName);
+                        $('#qvImage').attr('src', data.imageUrl);
+                        $('#qvId').val(data.productId);
+                        var stock = data.stockQuantity;
+                        var stockBadge = $('#qvStock');
+                        if (stock > 0) {
+                            stockBadge.text('In Stock (' + stock + ')').addClass('bg-success-subtle text-success').removeClass('bg-danger-subtle text-danger');
+                        } else {
+                            stockBadge.text('Out of Stock').addClass('bg-danger-subtle text-danger').removeClass('bg-success-subtle text-success');
+                        }
+                        $('#quickViewModal').modal('show');
+                    }
+                }
+            });
+        }
+    </script>
+    @if (TempData["Success"] != null)
+    {
+        <script>
+            Swal.fire({ icon: 'success', title: 'Success!', text: '@TempData["Success"]', showConfirmButton: false, timer: 2000 });
+        </script>
+    }
+}

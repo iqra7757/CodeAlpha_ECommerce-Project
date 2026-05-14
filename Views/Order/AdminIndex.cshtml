@@ -1,0 +1,157 @@
+﻿@model IEnumerable<CodeAlpha_EcommerceStore.Models.Order>
+
+<div class="container-fluid px-4 mt-4 pb-5">
+    
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark mb-0">Order Management</h2>
+        <span class="text-muted">Total Orders: @Model.Count()</span>
+    </div>
+
+    <!-- 1. Stats Cards Section -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-primary border-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="bi bi-currency-dollar text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="small text-muted mb-1 fw-bold text-uppercase">Total Revenue</h6>
+                        <h4 class="fw-bold mb-0">Rs. @Model.Sum(o => o.TotalAmount).ToString("N0")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-warning border-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="bi bi-clock-history text-warning fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="small text-muted mb-1 fw-bold text-uppercase">Pending</h6>
+                        <h4 class="fw-bold mb-0">@Model.Count(o => o.Status == "Pending")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-success border-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="bi bi-truck text-success fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="small text-muted mb-1 fw-bold text-uppercase">Shipped</h6>
+                        <h4 class="fw-bold mb-0">@Model.Count(o => o.Status == "Shipped")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white border-start border-danger border-4">
+                <div class="d-flex align-items-center">
+                    <div class="bg-danger bg-opacity-10 p-3 rounded-3 me-3">
+                        <i class="bi bi-x-circle text-danger fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="small text-muted mb-1 fw-bold text-uppercase">Cancelled</h6>
+                        <h4 class="fw-bold mb-0">@Model.Count(o => o.Status == "Cancelled")</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Orders Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr class="text-muted small uppercase">
+                        <th class="ps-4 py-3">ORDER ID</th>
+                        <th class="py-3">CUSTOMER</th>
+                        <th class="py-3">DATE</th>
+                        <th class="py-3">TOTAL</th>
+                        <th class="py-3">STATUS</th>
+                        <th class="text-center py-3">ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold text-dark">#@order.OrderId</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-light rounded-circle text-center me-2" style="width:32px; height:32px; line-height:32px;">
+                                        <i class="bi bi-person text-secondary"></i>
+                                    </div>
+                                    <span>@(order.User?.FullName ?? "Guest User")</span>
+                                </div>
+                            </td>
+                            <td>@order.OrderDate?.ToString("dd MMM, yyyy")</td>
+                            <td>
+                                <span class="fw-bold text-primary">Rs. @order.TotalAmount.ToString("N0")</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill py-2 px-3
+                                    @(order.Status == "Delivered" ? "bg-success" :
+                                                                            order.Status == "Shipped" ? "bg-info text-dark" :
+                                                                            order.Status == "Cancelled" ? "bg-danger" : "bg-warning text-dark")">
+                                    @order.Status
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <!-- Status Form -->
+                                    <form asp-action="UpdateStatus" method="post" class="d-flex align-items-center gap-1">
+                                        <input type="hidden" name="orderId" value="@order.OrderId" />
+                                        <select name="status" class="form-select form-select-sm rounded-pill border-light-subtle shadow-sm" style="width: 120px;">
+                                            <!option value="Pending" @(order.Status == "Pending" ? "selected" : "")>Pending</!option>
+                                            <!option value="Shipped" @(order.Status == "Shipped" ? "selected" : "")>Shipped</!option>
+                                            <!option value="Delivered" @(order.Status == "Delivered" ? "selected" : "")>Delivered</!option>
+                                            <!option value="Cancelled" @(order.Status == "Cancelled" ? "selected" : "")>Cancelled</!option>
+                                        </select>
+                                        <button type="submit" class="btn btn-primary btn-sm rounded-circle" title="Update Status">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- Details Button -->
+                                    <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Details">
+                                        <i class="bi bi-eye-fill me-1"></i> Details
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table thead th {
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        border-bottom: none;
+    }
+
+    .card {
+        transition: transform 0.2s;
+    }
+
+    .form-select-sm {
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+</style>

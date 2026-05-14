@@ -1,0 +1,250 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShopEasy - Professional</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Default Light */
+            --bg-overlay: rgba(248, 250, 252, 0.85); --card: rgba(255, 255, 255, 0.95); 
+            --txt: #1e293b; --muted: #64748b; --inp: #f1f5f9; --brd: #e2e8f0; --pri: #6366f1;
+        }
+
+        [data-theme="dark"] {
+            --bg-overlay: rgba(15, 23, 42, 0.9); --card: rgba(30, 41, 59, 0.95); 
+            --txt: #f8fafc; --muted: #94a3b8; --inp: #0f172a; --brd: #334155; --pri: #818cf8;
+        }
+
+        [data-theme="midnight"] {
+            --bg-overlay: rgba(2, 6, 23, 0.9); --card: rgba(15, 23, 42, 0.95); 
+            --txt: #f1f5f9; --muted: #64748b; --inp: #020617; --brd: #1e293b; --pri: #38bdf8;
+        }
+
+        [data-theme="emerald"] {
+            --bg-overlay: rgba(240, 253, 244, 0.85); --card: #ffffff; 
+            --txt: #064e3b; --muted: #059669; --inp: #ecfdf5; --brd: #d1fae5; --pri: #10b981;
+        }
+
+        [data-theme="rose"] {
+            --bg-overlay: rgba(255, 241, 242, 0.85); --card: #ffffff; 
+            --txt: #881337; --muted: #be123c; --inp: #fff1f2; --brd: #ffe4e6; --pri: #f43f5e;
+        }
+
+        [data-theme="sunset"] {
+            --bg-overlay: rgba(255, 247, 237, 0.85); --card: #ffffff; 
+            --txt: #7c2d12; --muted: #c2410c; --inp: #fff7ed; --brd: #ffedd5; --pri: #f97316;
+        }
+
+        [data-theme="ocean"] {
+            --bg-overlay: rgba(240, 249, 255, 0.85); --card: #ffffff; 
+            --txt: #0c4a6e; --muted: #0284c7; --inp: #f0f9ff; --brd: #e0f2fe; --pri: #0ea5e9;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            /* Yahan aap apni image use kar sakte hain */
+            background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
+                        url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s ease;
+            padding: 40px 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--brd);
+            border-radius: 28px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Floating Theme Picker */
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card);
+            padding: 8px 15px;
+            border-radius: 50px;
+            display: flex;
+            gap: 10px;
+            border: 1px solid var(--brd);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .theme-dot {
+            width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: 0.2s;
+        }
+        .theme-dot:hover { transform: scale(1.3); }
+
+        .auth-tabs {
+            display: flex; background: var(--inp); padding: 5px; border-radius: 12px; margin-bottom: 25px;
+        }
+        .tab-btn {
+            flex: 1; border: none; background: transparent; padding: 10px;
+            font-weight: 700; color: var(--muted); border-radius: 9px; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--pri); color: white; }
+
+        /* Original Fields Styling */
+        .field-group { margin-bottom: 18px; }
+        .field-group label { display: block; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-box { position: relative; }
+        .input-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+        .input-box input, .input-box textarea {
+            width: 100%; padding: 12px 15px 12px 42px; background: var(--inp);
+            border: 1.5px solid var(--brd); border-radius: 12px; color: var(--txt); transition: 0.3s;
+        }
+        .input-box input:focus { outline: none; border-color: var(--pri); background: var(--card); }
+
+        .btn-action {
+            width: 100%; padding: 14px; background: var(--pri); border: none;
+            border-radius: 12px; color: white; font-weight: 700; margin-top: 10px; cursor: pointer;
+        }
+
+        .section { display: none; }
+        .section.active { display: block; animation: slideUp 0.4s ease; }
+        @@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="theme-selector">
+        <div class="theme-dot" style="background:#fff; border:1px solid #ccc" onclick="setTheme('light')"></div>
+        <div class="theme-dot" style="background:#1e293b" onclick="setTheme('dark')"></div>
+        <div class="theme-dot" style="background:#020617" onclick="setTheme('midnight')"></div>
+        <div class="theme-dot" style="background:#10b981" onclick="setTheme('emerald')"></div>
+        <div class="theme-dot" style="background:#f43f5e" onclick="setTheme('rose')"></div>
+        <div class="theme-dot" style="background:#f97316" onclick="setTheme('sunset')"></div>
+        <div class="theme-dot" style="background:#0ea5e9" onclick="setTheme('ocean')"></div>
+    </div>
+
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <h3 class="fw-800 mb-1">ShopEasy</h3>
+            <p class="text-muted small">Your Premium Shopping Experience</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" onclick="switchView('login', this)">Sign In</button>
+            <button class="tab-btn" onclick="switchView('reg', this)">Register</button>
+        </div>
+
+        @if (ViewBag.Error != null) { <div class="alert alert-danger py-2 small">@ViewBag.Error</div> }
+        @if (TempData["Success"] != null) { <div class="alert alert-success py-2 small">@TempData["Success"]</div> }
+
+        <!-- LOGIN SECTION -->
+        <div id="login-view" class="section active">
+            <form asp-action="Login" method="post">
+                <div class="field-group">
+                    <label>Email Address</label>
+                    <div class="input-box">
+                        <i class="bi bi-envelope"></i>
+                        <input type="email" name="email" placeholder="name@example.com" required />
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Password</label>
+                    <div class="input-box">
+                        <i class="bi bi-lock"></i>
+                        <input type="password" name="password" placeholder="••••••••" required />
+                    </div>
+                </div>
+                <button type="submit" class="btn-action">Log In</button>
+            </form>
+        </div>
+
+        <!-- REGISTER SECTION (Keeping all your fields) -->
+        <div id="reg-view" class="section">
+            <form asp-action="Register" method="post">
+                <div class="field-group">
+                    <label>Full Name</label>
+                    <div class="input-box">
+                        <i class="bi bi-person"></i>
+                        <input type="text" name="FullName" placeholder="Enter full name" required />
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Email</label>
+                    <div class="input-box">
+                        <i class="bi bi-envelope"></i>
+                        <input type="email" name="Email" placeholder="email@example.com" required />
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Phone Number</label>
+                    <div class="input-box">
+                        <i class="bi bi-telephone"></i>
+                        <input type="tel" name="PhoneNumber" placeholder="+92 300 0000000" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="field-group">
+                            <label>Password</label>
+                            <div class="input-box">
+                                <i class="bi bi-shield-lock"></i>
+                                <input type="password" name="password" placeholder="••••" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="field-group">
+                            <label>Confirm</label>
+                            <div class="input-box">
+                                <i class="bi bi-shield-check"></i>
+                                <input type="password" name="confirmPassword" placeholder="••••" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Shipping Address</label>
+                    <div class="input-box">
+                        <i class="bi bi-geo-alt"></i>
+                        <textarea name="Address" rows="2" placeholder="Full Address..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn-action">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function switchView(view, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(view + '-view').classList.add('active');
+        }
+
+        function setTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('shop-theme', t);
+        }
+
+        const current = localStorage.getItem('shop-theme') || 'light';
+        setTheme(current);
+    </script>
+</body>
+</html>

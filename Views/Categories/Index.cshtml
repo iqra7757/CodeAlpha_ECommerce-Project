@@ -1,0 +1,158 @@
+﻿@model IEnumerable<CodeAlpha_EcommerceStore.Models.Category>
+
+<div class="container-fluid py-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
+        <div>
+            <h3 class="fw-bold text-dark m-0">Shop by Category</h3>
+            <p class="text-muted small">Manage categories and click on one to see its images</p>
+        </div>
+        <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            <i class="bi bi-plus-lg me-2"></i> Add New
+        </button>
+    </div>
+
+    <!-- Grid View -->
+    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-5 row-cols-xl-6 g-3">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm category-card text-center rounded-4 overflow-hidden bg-white">
+                    <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@item.CategoryId" class="text-decoration-none">
+                        <div class="image-container p-3">
+                            <div class="img-wrapper rounded-circle mx-auto shadow-sm overflow-hidden border" style="width: 100px; height: 100px;">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" class="img-fluid h-100 w-100 object-fit-cover" alt="@item.CategoryName" />
+                                }
+                                else
+                                {
+                                    <img src="https://ui-avatars.com/api/?name=@item.CategoryName&background=random" class="img-fluid h-100 w-100" />
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body pt-0 pb-1">
+                            <h6 class="fw-bold text-dark mb-1 text-truncate px-2">@item.CategoryName</h6>
+                        </div>
+                    </a>
+                    
+                    <div class="card-footer bg-transparent border-0 pb-3">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" onclick="openEditModal('@item.CategoryId')" class="btn btn-sm btn-light border shadow-sm rounded-circle text-info">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                            <form asp-action="Delete" asp-controller="Categories" asp-route-id="@item.CategoryId" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-light border shadow-sm rounded-circle text-danger" onclick="return confirm('Delete this category?')">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold">Create New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Create" enctype="multipart/form-data" method="post">
+                    <div class="mb-3">
+                        <label class="small fw-bold">CATEGORY NAME</label>
+                        <input name="CategoryName" class="form-control bg-light border-0 py-2" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">DESCRIPTION</label>
+                        <textarea name="Description" class="form-control bg-light border-0" rows="3"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="small fw-bold">CATEGORY IMAGE</label>
+                        <input type="file" name="ImageFile" class="form-control bg-light border-0" accept="image/*" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">Save Category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL (Fixed Form Tag) -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 'onsubmit' lagaya hai taake URL hamesha sahi ID ke saath jaye -->
+                <form id="editForm" asp-action="Edit" method="post" enctype="multipart/form-data" onsubmit="updateFormUrl()">
+                    <input type="hidden" id="editId" name="CategoryId" />
+                    <input type="hidden" id="editImageUrl" name="ImageUrl" />
+
+                    <div class="text-center mb-3">
+                        <img id="editImagePreview" src="" class="rounded-circle shadow-sm border" style="width: 80px; height: 80px; object-fit: cover; display: none;" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold">CATEGORY NAME</label>
+                        <input id="editName" name="CategoryName" class="form-control bg-light border-0" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="small fw-bold">DESCRIPTION</label>
+                        <textarea id="editDesc" name="Description" class="form-control bg-light border-0" rows="3"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="small fw-bold">CHANGE IMAGE (Optional)</label>
+                        <input type="file" name="ImageFile" class="form-control bg-light border-0" accept="image/*" />
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow">Update Category</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Form submit hote waqt URL mein ID add karne ke liye
+        function updateFormUrl() {
+        var id = $('#editId').val();
+        var form = document.getElementById('editForm');
+        form.action = '/Categories/Edit/' + id;
+        }
+
+        function openEditModal(id) {
+        $.ajax({
+        url: '/Categories/GetCategory/' + id,
+        type: 'GET',
+        success: function (data) {
+        if (data) {
+        $('#editId').val(data.categoryId || data.CategoryId);
+        $('#editName').val(data.categoryName || data.CategoryName);
+        $('#editDesc').val(data.description || data.Description);
+                        
+        var imgPath = data.imageUrl || data.ImageUrl;
+        $('#editImageUrl').val(imgPath);
+                        
+        if (imgPath) {
+        $('#editImagePreview').attr('src', imgPath).show();
+        } else {
+        $('#editImagePreview').hide();
+        }
+        $('#editCategoryModal').modal('show');
+        }
+        },
+        error: function() { alert("Could not fetch data."); }
+        });
+        }
+    </script>
+}

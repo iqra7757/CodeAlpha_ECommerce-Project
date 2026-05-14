@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="amethyst">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ShopEasy Admin</title>
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        :root {
+            --bg: #fdfbff; --sidebar: #ffffff; --card: #ffffff; --text: #2d1b4e; 
+            --muted: #7e6f9d; --border: #e9e2f5; --accent: #9b59b6;
+            --nav-hover: rgba(155, 89, 182, 0.1);
+        }
+
+        [data-theme="cyberpunk"] {
+            --bg: #0d0221; --sidebar: #150734; --card: #150734; --text: #00f2ff; 
+            --muted: #70639e; --border: #24144e; --accent: #ff00ff;
+            --nav-hover: rgba(255, 0, 255, 0.1);
+        }
+
+        [data-theme="forest"] {
+            --bg: #f0f4f0; --sidebar: #ffffff; --card: #ffffff; --text: #1b2e1b; 
+            --muted: #6b8e6b; --border: #dde7dd; --accent: #27ae60;
+            --nav-hover: rgba(39, 174, 96, 0.1);
+        }
+
+        [data-theme="gold"] {
+            --bg: #1a1a1a; --sidebar: #262626; --card: #262626; --text: #f1c40f; 
+            --muted: #a68b00; --border: #3d3d3d; --accent: #f39c12;
+            --nav-hover: rgba(241, 196, 15, 0.1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: 0.4s;
+            overflow-x: hidden;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            height: 100vh;
+            position: fixed;
+            left: 0; top: 0;
+            border-right: 1px solid var(--border);
+            padding: 25px 20px;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed { transform: translateX(-260px); }
+
+        .brand-logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            text-decoration: none !important;
+        }
+
+        .nav-item-custom {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+            margin-bottom: 8px;
+        }
+
+        .nav-item-custom:hover, .nav-item-custom.active {
+            background: var(--nav-hover);
+            color: var(--accent);
+        }
+
+        .main-body {
+            margin-left: 260px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-body.expanded { margin-left: 0; }
+
+        header.top-bar {
+            height: 70px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0; z-index: 999;
+        }
+
+        .btn-toggle {
+            background: var(--nav-hover);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            border-radius: 10px;
+            padding: 5px 12px;
+            transition: 0.3s;
+        }
+        .btn-toggle:hover { background: var(--accent); color: white; }
+
+        .theme-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .theme-dot:hover { transform: scale(1.2); }
+
+        footer {
+            margin-top: auto;
+            padding: 20px 40px;
+            border-top: 1px solid var(--border);
+            background: var(--card);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="mainSidebar">
+        <a class="brand-logo" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-lightning-charge-fill"></i> ShopEasy
+        </a>
+
+        <nav>
+            <a class="nav-item-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "active" : "")" 
+               asp-controller="Admin" asp-action="Dashboard">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            
+           
+            <a class="nav-item-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Categories" ? "active" : "")" 
+               asp-controller="Categories" asp-action="Index">
+                <i class="bi bi-layers"></i> Categories
+            </a>
+             <a class="nav-item-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Products" ? "active" : "")" 
+               asp-controller="Products" asp-action="Index">
+                <i class="bi bi-box-seam"></i> Products
+            </a>
+
+            <!-- Admin: Manage All Orders -->
+            
+            
+
+            <!-- User: Personal Links -->
+            <a class="nav-item-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "Index" && ViewContext.RouteData.Values["Controller"]?.ToString() == "Order" ? "active" : "")" 
+               asp-controller="Order" asp-action="Index">
+                <i class="bi bi-bag-check"></i> My Orders
+            </a>
+            <a class="nav-item-custom @(ViewContext.RouteData.Values["Action"]?.ToString() == "AdminIndex" ? "active" : "")" 
+               asp-controller="Order" asp-action="AdminIndex">
+                <i class="bi bi-gear-fill"></i> Manage Orders
+            </a>
+            <hr style="border-color: var(--border)">
+
+            <a class="nav-item-custom @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Cart" ? "active" : "")" 
+               asp-controller="Cart" asp-action="Index">
+                <i class="bi bi-cart3"></i> Cart
+            </a>
+
+            <hr style="border-color: var(--border)">
+
+            <a class="nav-item-custom text-danger" href="#">
+                <i class="bi bi-box-arrow-left"></i> Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Body Area -->
+    <div class="main-body" id="contentArea">
+        
+        <header class="top-bar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn-toggle" onclick="toggleSidebar()">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                <h5 class="m-0 fw-bold">CodeAlpha Store</h5>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex gap-2 bg-light p-2 rounded-pill border">
+                    <div class="theme-dot" style="background:#9b59b6" onclick="setGlobalTheme('amethyst')"></div>
+                    <div class="theme-dot" style="background:#ff00ff" onclick="setGlobalTheme('cyberpunk')"></div>
+                    <div class="theme-dot" style="background:#27ae60" onclick="setGlobalTheme('forest')"></div>
+                    <div class="theme-dot" style="background:#f1c40f" onclick="setGlobalTheme('gold')"></div>
+                </div>
+                <div class="vr mx-2" style="height: 30px; opacity: 0.1;"></div>
+                <i class="bi bi-bell fs-5"></i>
+                <img src="https://ui-avatars.com/api/?name=Admin&background=random" width="35" class="rounded-circle shadow-sm">
+            </div>
+        </header>
+
+        <main role="main" class="container-fluid p-4">
+            @RenderBody()
+        </main>
+
+        <footer>
+            <div class="d-flex justify-content-between">
+                <span>&copy; 2026 - ShopEasy Premium Panel</span>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-decoration-none text-muted">Privacy</a>
+                    <a href="#" class="text-decoration-none text-muted">Support</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('mainSidebar');
+            const content = document.getElementById('contentArea');
+            sidebar.classList.toggle('collapsed');
+            content.classList.toggle('expanded');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarState', isCollapsed ? 'hidden' : 'visible');
+        }
+
+        function setGlobalTheme(name) {
+            document.documentElement.setAttribute('data-theme', name);
+            localStorage.setItem('user-global-theme', name);
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedTheme = localStorage.getItem('user-global-theme') || 'amethyst';
+            setGlobalTheme(savedTheme);
+            if (localStorage.getItem('sidebarState') === 'hidden') {
+                document.getElementById('mainSidebar').classList.add('collapsed');
+                document.getElementById('contentArea').classList.add('expanded');
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

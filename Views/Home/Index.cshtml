@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    /* Is pure page par background image lagane ke liye main content area ko target karein */
+    main[role="main"] {
+        /* Direct internet link */
+        background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop');
+        /* Image property taake wo screen par puri fit aaye bina katey */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        /* Puri height fit karne ke liye top-bar aur footer minus karein */
+        min-height: calc(100vh - 70px - 60px);
+        /* Margin/Padding khatam karein taake image edges tak touch karey */
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+</style>

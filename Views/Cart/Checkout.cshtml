@@ -1,0 +1,180 @@
+﻿@model IEnumerable<CodeAlpha_EcommerceStore.Models.CartItem>
+
+<div class="container mt-4 pb-5">
+    <div class="row">
+        <!-- LEFT COLUMN: Shipping & Payment Form -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+                <div class="bg-success py-3 text-center text-white">
+                    <h4 class="mb-0 fw-bold">Secure Checkout</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+                        
+                        <!-- Shipping Information -->
+                        <h6 class="fw-bold text-uppercase small text-muted mb-3">Shipping Information</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="x-small fw-bold mb-1">Full Name</label>
+                                <input name="CustomerName" class="form-control fs-6" placeholder="Your Full Name" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="x-small fw-bold mb-1">Mobile Number</label>
+                                <input name="PhoneNumber" class="form-control fs-6" placeholder="03xx-xxxxxxx" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="x-small fw-bold mb-1">Email Address (Optional)</label>
+                                <input name="Email" type="email" class="form-control fs-6" placeholder="email@example.com" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="x-small fw-bold mb-1">City</label>
+                                <input name="City" class="form-control fs-6" placeholder="e.g. Muzaffargarh" required />
+                            </div>
+                            <div class="col-12">
+                                <label class="x-small fw-bold mb-1">Full Delivery Address</label>
+                                <textarea name="ShippingAddress" class="form-control fs-6" rows="2" placeholder="House#, Street#, Area..." required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Section -->
+                        <h6 class="fw-bold text-uppercase small text-muted mt-4 mb-3">Select Payment Method</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="PaymentMethod" id="cod" value="Cash on Delivery" checked onclick="togglePaymentSection('cod')">
+                                <label class="btn btn-outline-secondary w-100 py-3 rounded-3 shadow-sm" for="cod">
+                                    <i class="bi bi-cash-stack me-2"></i> Cash on Delivery
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="radio" class="btn-check" name="PaymentMethod" id="bank" value="Bank Transfer" onclick="togglePaymentSection('bank')">
+                                <label class="btn btn-outline-primary w-100 py-3 rounded-3 shadow-sm" for="bank">
+                                    <i class="bi bi-bank me-2"></i> Bank Transfer / Wallet
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Details -->
+                        <div id="bankVerificationArea" class="mt-4" style="display:none;">
+                            <div class="p-3 border rounded-4 bg-light border-primary-subtle">
+                                <p class="small fw-bold mb-2 text-primary">1. CHOOSE BANK ACCOUNT:</p>
+                                <div class="d-flex gap-2 mb-3 overflow-auto pb-2">
+                                    <button type="button" class="btn btn-sm btn-white border shadow-sm px-3 text-nowrap" onclick="selectOurBank(this, 'JazzCash')">JazzCash</button>
+                                    <button type="button" class="btn btn-sm btn-white border shadow-sm px-3 text-nowrap" onclick="selectOurBank(this, 'EasyPaisa')">EasyPaisa</button>
+                                    <button type="button" class="btn btn-sm btn-white border shadow-sm px-3 text-nowrap" onclick="selectOurBank(this, 'Bank Alfalah')">Bank Alfalah</button>
+                                </div>
+
+                                <div id="verificationFields" style="display:none;" class="animate__animated animate__fadeIn">
+                                    <div class="alert alert-info py-2 mb-3 fs-7 border-0 shadow-sm">
+                                        <i class="bi bi-info-circle-fill me-2"></i> Please send <b>Rs. @Model.Sum(i => i.Product.Price * i.Quantity).ToString("N0")</b> to the bank and provide details:
+                                    </div>
+
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="x-small fw-bold">Your Account/Phone No</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="03xx..." id="senderAcc">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="x-small fw-bold">Transaction ID (Optional)</label>
+                                            <input type="text" class="form-control form-control-sm" placeholder="TID Number">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <div class="mt-4 pt-2">
+                            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill shadow-lg fw-bold py-3 hover-lift">
+                                <i class="bi bi-shield-check me-2"></i> CONFIRM & PLACE ORDER
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 sticky-top" style="top: 20px;">
+                <div class="card-header bg-white py-3 border-bottom-0">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-bag-check me-2"></i>Order Summary</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="px-3" style="max-height: 350px; overflow-y: auto;">
+                        @foreach (var item in Model)
+                        {
+                            <div class="d-flex align-items-center py-3 border-bottom">
+                                <div class="bg-light rounded-3 p-2 me-3 border">
+                                    <i class="bi bi-box-seam text-success fs-5"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <p class="small fw-bold mb-0">@item.Product?.ProductName</p>
+                                    <small class="text-muted">Qty: @item.Quantity × Rs. @item.Product?.Price.ToString("N0")</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="small fw-bold text-dark">Rs. @((item.Product.Price * item.Quantity).ToString("N0"))</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-0 p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Subtotal</span>
+                        <span class="small fw-bold">Rs. @Model.Sum(i => i.Product.Price * i.Quantity).ToString("N0")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted small">Shipping Fee</span>
+                        <span class="small text-success fw-bold">FREE</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark">Total Amount</span>
+                        <span class="h5 fw-bold text-success mb-0">Rs. @Model.Sum(i => i.Product.Price * i.Quantity).ToString("N0")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .x-small { font-size: 0.75rem; color: #6c757d; }
+    .fs-7 { font-size: 0.85rem; }
+    .btn-white { background: white; color: #333; }
+    .hover-lift { transition: transform 0.2s; }
+    .hover-lift:hover { transform: translateY(-3px); }
+    /* Custom Scrollbar for summary */
+    .px-3::-webkit-scrollbar { width: 4px; }
+    .px-3::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
+</style>
+
+@section Scripts {
+    <script>
+        function togglePaymentSection(type) {
+            const area = document.getElementById('bankVerificationArea');
+            const senderInput = document.getElementById('senderAcc');
+            
+            if (type === 'bank') {
+                area.style.display = 'block';
+                senderInput.setAttribute('required', 'true');
+            } else {
+                area.style.display = 'none';
+                senderInput.removeAttribute('required');
+            }
+        }
+
+        function selectOurBank(btn, bankName) {
+            document.getElementById('verificationFields').style.display = 'block';
+            
+            const btns = document.querySelectorAll('#bankVerificationArea button');
+            btns.forEach(b => {
+                b.classList.remove('btn-primary', 'text-white');
+                b.classList.add('btn-white');
+            });
+            btn.classList.replace('btn-white', 'btn-primary');
+            btn.classList.add('text-white');
+        }
+    </script>
+}
